@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  author: Linus Kendall
+  description: Installation of SSL Mate certificates.
+  license: BSD
+  min_ansible_version: 1.2
+  platforms:
+  - name: EL
+    versions:
+    - 6
+    - 7
+  - name: Fedora
+    versions:
+    - 19
+    - 20
+  - name: Ubuntu
+    versions:
+    - lucid
+    - precise
+    - saucy
+    - trusty
+  - name: Debian
+    versions:
+    - squeeze
+    - wheezy
+  categories:
+  - networking
+  - web
+dependencies: []

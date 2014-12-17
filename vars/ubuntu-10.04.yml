@@ -1,0 +1,5 @@
+sslmate_sources_dir: /etc/apt/sources.list.d
+sslmate_key_dir: /etc/apt/trusted.gpg.d
+sslmate_sources_url: https://sslmate.com/apt/ubuntu1004/sslmate.list
+sslmate_key_url: https://sslmate.com/apt/ubuntu1004/sslmate.gpg
+sslmate_package_name: sslmate

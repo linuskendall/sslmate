@@ -1,0 +1,48 @@
+- name: Include OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found: 
+    - "{{ansible_distribution | lower }}-{{ansible_distribution_version}}.yml"
+    - "{{ansible_distribution | lower }}.yml"
+    - "{{ansible_os_family | lower}}.yml"
+
+- name: install ssl mate repo
+  get_url: dest="{{sslmate_sources_dir}}" url="{{sslmate_sources_url}}"
+  register: ssl_mate_source
+
+- name: install ssl mate key
+  get_url: dest="{{sslmate_key_dir}}"  url="{{sslmate_key_url}}"
+  register: ssl_mate_key
+
+- name: update apt cache
+  apt: update_cache=yes
+  when: ssl_mate_key|changed and ansible_os_family == 'Debian'
+
+- name: install sslmate
+  yum: pkg="{{sslmate_package_name}}" state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: install sslmate
+  apt: pkg="{{sslmate_package_name}}" state=present
+  when: ansible_os_family == 'Debian'
+
+- name: create sslmate directory
+  file: path=/etc/sslmate state=directory
+
+- name: install configuration file
+  template: src=sslmate.j2 dest=/etc/sslmate.conf mode=0400 owner=root group=root
+
+- name: copy private key
+  copy: content="{{item.private_key}}" dest="/etc/sslmate/{{item.domain}}.key" mode=0400 owner=root group=root
+  with_items: sslmate_cert_domains
+
+- name: download certificates
+  command: sslmate download "{{item.domain}}"
+  ignore_errors: true
+  register: sslmate
+  with_items: sslmate_cert_domains
+
+- name: install certificate update file
+  copy: src=update_certificates dest=/usr/local/bin/update_certificates mode=0755 owner=root group=root
+
+- name: install cron job for updating ssl certs
+  cron: hour=4 name="update ssl certs" job="/usr/local/bin/update_certificates" user=root state=present
