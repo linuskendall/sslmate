@@ -1,0 +1,1 @@
+ssl_mate_install_method: package # only supports package right now, later include "source"

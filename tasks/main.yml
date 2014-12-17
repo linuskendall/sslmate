@@ -1,3 +1,4 @@
+# Include configuration file depending on what we have available (might allow the role to work for OSes we haven't yet supported)
 - name: Include OS specific variables
   include_vars: "{{ item }}"
   with_first_found: 
@@ -5,42 +6,52 @@
     - "{{ansible_distribution | lower }}.yml"
     - "{{ansible_os_family | lower}}.yml"
 
+# For all platforms there are two steps that need to be taken 
+# - download repository description
+# - download certificate
 - name: install ssl mate repo
   get_url: dest="{{sslmate_sources_dir}}" url="{{sslmate_sources_url}}"
   register: ssl_mate_source
+  when: ssl_mate_install_method == 'package'
 
 - name: install ssl mate key
   get_url: dest="{{sslmate_key_dir}}"  url="{{sslmate_key_url}}"
   register: ssl_mate_key
+  when: ssl_mate_install_method == 'package'
 
+# Take different install routes depending on platform
 - name: update apt cache
   apt: update_cache=yes
-  when: ssl_mate_key|changed and ansible_os_family == 'Debian'
+  when: ssl_mate_key|changed and ansible_os_family == 'Debian' and ssl_mate_install_method == 'package'
 
 - name: install sslmate
   yum: pkg="{{sslmate_package_name}}" state=present
-  when: ansible_os_family == 'RedHat'
+  when: ansible_os_family == 'RedHat' and ssl_mate_install_method == 'package'
 
 - name: install sslmate
   apt: pkg="{{sslmate_package_name}}" state=present
-  when: ansible_os_family == 'Debian'
+  when: ansible_os_family == 'Debian' and ssl_mate_install_method == 'package'
 
+# Create configuration files
 - name: create sslmate directory
   file: path=/etc/sslmate state=directory
 
 - name: install configuration file
   template: src=sslmate.j2 dest=/etc/sslmate.conf mode=0400 owner=root group=root
 
+# Copy the domain private key (SSL mate requires this to be present in order to decide which certs to download)
 - name: copy private key
   copy: content="{{item.private_key}}" dest="/etc/sslmate/{{item.domain}}.key" mode=0400 owner=root group=root
   with_items: sslmate_cert_domains
 
+# Download all the pending certificates
 - name: download certificates
   command: sslmate download "{{item.domain}}"
   ignore_errors: true
   register: sslmate
   with_items: sslmate_cert_domains
 
+# Set-up automatic updation at renewal
 - name: install certificate update file
   copy: src=update_certificates dest=/usr/local/bin/update_certificates mode=0755 owner=root group=root
 
