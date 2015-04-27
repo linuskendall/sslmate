@@ -1,4 +1,6 @@
+{% if sslmate_account_id is defined: %}
 account_id {{sslmate_account_id}}
+{% endif %}
 api_key {{sslmate_api_key}}
 key_directory /etc/sslmate/
 cert_directory /etc/sslmate/
