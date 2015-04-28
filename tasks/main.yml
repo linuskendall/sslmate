@@ -15,7 +15,7 @@
   when: ssl_mate_install_method == 'package'
 
 - name: install ssl mate key
-  get_url: dest="{{sslmate_key_dir}}"  url="{{sslmate_key_url}}"
+  get_url: dest="{{sslmate_key_dir}}" url="{{sslmate_key_url}}"
   register: ssl_mate_key
   when: ssl_mate_install_method == 'package'
 
