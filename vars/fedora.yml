@@ -1,5 +1,5 @@
-sslmate_sources_dir: /etc/yum.repos.d
-sslmate_key_dir: /etc/pki/rpm-gpg
+sslmate_sources_dir: "/etc/yum.repos.d"
+sslmate_key_dir: "/etc/pki/rpm-gpg/"
 sslmate_sources_url: https://sslmate.com/yum/fedora/SSLMate.repo
 sslmate_key_url: https://sslmate.com/yum/fedora/RPM-GPG-KEY-SSLMate
 sslmate_package_name: sslmate
