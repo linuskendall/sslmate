@@ -38,6 +38,7 @@
 
 - name: install configuration file
   template: src=sslmate.j2 dest=/etc/sslmate.conf mode=0400 owner=root group=root
+  when: sslmate_api_key is defined
 
 # Copy the domain private key (SSL mate requires this to be present in order to decide which certs to download)
 - name: copy private key
