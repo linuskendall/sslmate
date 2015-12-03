@@ -2,5 +2,5 @@
 
 if sslmate download --all > /dev/null
 then
-  systemctl sslmate restart > /dev/null
+  systemctl restart nginx > /dev/null
 fi
